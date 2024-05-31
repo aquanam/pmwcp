@@ -1,0 +1,51 @@
+#!/bin/python
+
+import argparse
+import libpmwcp
+import sys
+
+sys.excepthook = libpmwcp.tools.exception_handler
+
+
+class CapitalizedHelpFormatter(argparse.HelpFormatter):
+    
+    def add_usage(self, usage, actions, groups, prefix=None):
+        if prefix is None:
+            prefix = f'{libpmwcp.color.Style.BOLD}{libpmwcp.color.Foreground.GREEN}Usage{libpmwcp.color.Style.RESET}: '
+
+        return super().add_usage(usage, actions, groups, prefix)
+
+
+# Argument parser creation.
+parser = argparse.ArgumentParser(
+    prog='pmwcp',
+    description=f'{libpmwcp.color.Foreground.BLUE}{libpmwcp.color.Style.BOLD}'
+    + 'A simple command-line frontend for a pmwcp instance.'
+    + f'{libpmwcp.color.Style.RESET}',
+    add_help=False,
+    formatter_class=CapitalizedHelpFormatter)
+
+parser._positionals.title = f'{libpmwcp.color.Style.BOLD}{libpmwcp.color.Foreground.GREEN}Positional arguments{libpmwcp.color.Style.RESET}:'
+parser._optionals.title = f'{libpmwcp.color.Style.BOLD}{libpmwcp.color.Foreground.GREEN}Optional arguments{libpmwcp.color.Style.RESET}'
+
+parser.add_argument('-h', '--help',
+                    action='help',
+                    default=argparse.SUPPRESS,
+                    help='Show this help message and exit.')
+
+parser.add_argument('-v', '--version',
+                    action='version',
+                    version=f"pfapi version {libpmwcp.__version__}",
+                    help='Show the pfapi version.')
+
+parser.add_argument('-s', '--sync',
+                    nargs='*',
+                    help='Sync with the new pmwcp repository.')
+
+args: argparse.Namespace = parser.parse_args()
+
+if len(sys.argv) == 1:
+    parser.print_usage()
+    parser.exit(message="pmwcp: error: no arguments provided\n")
+
+libpmwcp.instance.new_pmwcp_instance(args)

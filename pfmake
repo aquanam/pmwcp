@@ -1,0 +1,7 @@
+#!/bin/python
+
+import libpmwcp
+import sys
+
+sys.excepthook = libpmwcp.tools.exception_handler
+libpmwcp.instance.new_pfmake_instance()
